@@ -1,0 +1,6 @@
+{
+  "screen_id": "inventories:safecontainer",
+  "textures": {
+    "minecraft:textures/gui/container/shulker_box.png": "gui_texture_changer:textures/gui/safe.png"
+  }
+}
