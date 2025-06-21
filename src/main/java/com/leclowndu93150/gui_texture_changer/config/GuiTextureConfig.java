@@ -12,11 +12,14 @@ public class GuiTextureConfig {
     private final String screenId;
     private final Map<ResourceLocation, ResourceLocation> textureReplacements;
     private final Map<ResourceLocation, ResourceLocation> spriteReplacements;
+    private final boolean hideTitle;
 
-    public GuiTextureConfig(String screenId, Map<ResourceLocation, ResourceLocation> textureReplacements, Map<ResourceLocation, ResourceLocation> spriteReplacements) {
+    public GuiTextureConfig(String screenId, Map<ResourceLocation, ResourceLocation> textureReplacements,
+                            Map<ResourceLocation, ResourceLocation> spriteReplacements, boolean hideTitle) {
         this.screenId = screenId;
         this.textureReplacements = new HashMap<>(textureReplacements);
         this.spriteReplacements = new HashMap<>(spriteReplacements);
+        this.hideTitle = hideTitle;
     }
 
     public String getScreenId() {
@@ -29,6 +32,10 @@ public class GuiTextureConfig {
 
     public Map<ResourceLocation, ResourceLocation> getSpriteReplacements() {
         return spriteReplacements;
+    }
+
+    public boolean shouldHideTitle() {
+        return hideTitle;
     }
 
     public static GuiTextureConfig fromJson(JsonObject json) {
@@ -54,6 +61,8 @@ public class GuiTextureConfig {
             }
         }
 
-        return new GuiTextureConfig(screenId, textureReplacements, spriteReplacements);
+        boolean hideTitle = GsonHelper.getAsBoolean(json, "hide_title", false);
+
+        return new GuiTextureConfig(screenId, textureReplacements, spriteReplacements, hideTitle);
     }
 }

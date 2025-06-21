@@ -14,11 +14,11 @@ public class TextureChanger {
     private static final Map<ResourceLocation, ResourceLocation> spriteReplacements = new HashMap<>();
     private static String currentScreenId = null;
     private static boolean renderingScreen = false;
+    private static boolean hideTitle = false;
 
     public static ResourceLocation changeTexture(ResourceLocation texture) {
         if (!renderingScreen || currentScreenId == null) return texture;
 
-        // Track textures if tracking is enabled
         ScreenTracker.trackTexture(currentScreenId, texture);
 
         ResourceLocation replacement = textureReplacements.get(texture);
@@ -47,22 +47,29 @@ public class TextureChanger {
         renderingScreen = rendering;
     }
 
+    public static boolean shouldHideTitle() {
+        return hideTitle && renderingScreen && currentScreenId != null;
+    }
+
     public static void clearCurrentScreen() {
         currentScreenId = null;
         textureReplacements.clear();
         spriteReplacements.clear();
+        hideTitle = false;
     }
 
     private static void loadTexturesForScreen(String screenId) {
         textureReplacements.clear();
         spriteReplacements.clear();
+        hideTitle = false;
 
         GuiTextureConfig config = GuiTextureConfigLoader.getConfigForScreen(screenId);
         if (config != null) {
             textureReplacements.putAll(config.getTextureReplacements());
             spriteReplacements.putAll(config.getSpriteReplacements());
-            GUITextureChanger.LOGGER.info("Loaded {} texture replacements and {} sprite replacements for screen: {}",
-                    textureReplacements.size(), spriteReplacements.size(), screenId);
+            hideTitle = config.shouldHideTitle();
+            GUITextureChanger.LOGGER.info("Loaded {} texture replacements and {} sprite replacements for screen: {} (hide title: {})",
+                    textureReplacements.size(), spriteReplacements.size(), screenId, hideTitle);
         }
     }
 }
