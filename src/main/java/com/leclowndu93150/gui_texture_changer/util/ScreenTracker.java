@@ -22,34 +22,34 @@ public class ScreenTracker {
         trackingEnabled = true;
         discoveredScreens.clear();
         screenTextures.clear();
-        sendChatMessage(Component.literal("Screen tracking started! Open GUIs to discover their IDs and textures.")
+        sendChatMessage(Component.literal("Block GUI tracking started! Open containers to discover their block IDs.")
                 .withStyle(ChatFormatting.GREEN));
-        GUITextureChanger.LOGGER.info("Screen tracking started");
+        GUITextureChanger.LOGGER.info("Block GUI tracking started");
     }
 
     public static void stopTracking() {
         trackingEnabled = false;
-        sendChatMessage(Component.literal("Screen tracking stopped.")
+        sendChatMessage(Component.literal("Block GUI tracking stopped.")
                 .withStyle(ChatFormatting.YELLOW));
-        GUITextureChanger.LOGGER.info("Screen tracking stopped");
+        GUITextureChanger.LOGGER.info("Block GUI tracking stopped");
     }
 
-    public static void trackScreen(String screenId) {
-        if (trackingEnabled && screenId != null && !discoveredScreens.contains(screenId)) {
-            discoveredScreens.add(screenId);
-            screenTextures.put(screenId, new LinkedHashSet<>());
+    public static void trackScreen(String blockId) {
+        if (trackingEnabled && blockId != null && !discoveredScreens.contains(blockId)) {
+            discoveredScreens.add(blockId);
+            screenTextures.put(blockId, new LinkedHashSet<>());
             Set<String> loadedConfigs = GuiTextureConfigLoader.getLoadedScreenIds();
-            boolean isConfigured = loadedConfigs.contains(screenId);
+            boolean isConfigured = loadedConfigs.contains(blockId);
 
             MutableComponent message = Component.literal("Discovered: ").withStyle(ChatFormatting.AQUA);
 
-            if (screenId.contains(":")) {
-                String[] parts = screenId.split(":", 2);
+            if (blockId.contains(":")) {
+                String[] parts = blockId.split(":", 2);
                 message.append(Component.literal(parts[0]).withStyle(ChatFormatting.AQUA));
                 message.append(Component.literal(":").withStyle(ChatFormatting.GRAY));
                 message.append(Component.literal(parts[1]).withStyle(ChatFormatting.YELLOW));
             } else {
-                message.append(Component.literal(screenId).withStyle(ChatFormatting.YELLOW));
+                message.append(Component.literal(blockId).withStyle(ChatFormatting.YELLOW));
             }
 
             if (isConfigured) {
@@ -57,13 +57,13 @@ public class ScreenTracker {
             }
 
             sendChatMessage(message);
-            GUITextureChanger.LOGGER.info("Discovered screen: {}{}", screenId, isConfigured ? " (configured)" : "");
+            GUITextureChanger.LOGGER.info("Discovered block GUI: {}{}", blockId, isConfigured ? " (configured)" : "");
         }
     }
 
-    public static void trackTexture(String screenId, ResourceLocation texture) {
-        if (trackingEnabled && screenId != null && texture != null) {
-            Set<ResourceLocation> textures = screenTextures.computeIfAbsent(screenId, k -> new LinkedHashSet<>());
+    public static void trackTexture(String blockId, ResourceLocation texture) {
+        if (trackingEnabled && blockId != null && texture != null) {
+            Set<ResourceLocation> textures = screenTextures.computeIfAbsent(blockId, k -> new LinkedHashSet<>());
 
             if (!textures.contains(texture)) {
                 textures.add(texture);
@@ -72,7 +72,7 @@ public class ScreenTracker {
                 message.append(Component.literal(texture.toString()).withStyle(ChatFormatting.WHITE));
 
                 sendChatMessage(message);
-                GUITextureChanger.LOGGER.info("Screen '{}' uses texture: {}", screenId, texture);
+                GUITextureChanger.LOGGER.info("Block '{}' uses texture: {}", blockId, texture);
             }
         }
     }

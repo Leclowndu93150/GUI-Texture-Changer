@@ -12,35 +12,35 @@ import java.util.Objects;
 public class TextureChanger {
     private static final Map<ResourceLocation, ResourceLocation> textureReplacements = new HashMap<>();
     private static final Map<ResourceLocation, ResourceLocation> spriteReplacements = new HashMap<>();
-    private static String currentScreenId = null;
+    private static String currentBlockId = null;
     private static boolean renderingScreen = false;
     private static boolean hideTitle = false;
 
     public static ResourceLocation changeTexture(ResourceLocation texture) {
-        if (!renderingScreen || currentScreenId == null) return texture;
+        if (!renderingScreen || currentBlockId == null) return texture;
 
-        ScreenTracker.trackTexture(currentScreenId, texture);
+        ScreenTracker.trackTexture(currentBlockId, texture);
 
         ResourceLocation replacement = textureReplacements.get(texture);
         return replacement != null ? replacement : texture;
     }
 
     public static ResourceLocation changeSprite(ResourceLocation sprite) {
-        if (!renderingScreen || currentScreenId == null) return sprite;
+        if (!renderingScreen || currentBlockId == null) return sprite;
 
         ResourceLocation replacement = spriteReplacements.get(sprite);
         return replacement != null ? replacement : sprite;
     }
 
-    public static void setCurrentScreen(String screenId) {
-        if (!Objects.equals(currentScreenId, screenId)) {
-            currentScreenId = screenId;
-            loadTexturesForScreen(screenId);
+    public static void setCurrentScreen(String blockId) {
+        if (!Objects.equals(currentBlockId, blockId)) {
+            currentBlockId = blockId;
+            loadTexturesForBlock(blockId);
         }
     }
 
     public static String getCurrentScreenId() {
-        return currentScreenId;
+        return currentBlockId;
     }
 
     public static void setRenderingScreen(boolean rendering) {
@@ -48,28 +48,28 @@ public class TextureChanger {
     }
 
     public static boolean shouldHideTitle() {
-        return hideTitle && renderingScreen && currentScreenId != null;
+        return hideTitle && renderingScreen && currentBlockId != null;
     }
 
     public static void clearCurrentScreen() {
-        currentScreenId = null;
+        currentBlockId = null;
         textureReplacements.clear();
         spriteReplacements.clear();
         hideTitle = false;
     }
 
-    private static void loadTexturesForScreen(String screenId) {
+    private static void loadTexturesForBlock(String blockId) {
         textureReplacements.clear();
         spriteReplacements.clear();
         hideTitle = false;
 
-        GuiTextureConfig config = GuiTextureConfigLoader.getConfigForScreen(screenId);
+        GuiTextureConfig config = GuiTextureConfigLoader.getConfigForScreen(blockId);
         if (config != null) {
             textureReplacements.putAll(config.getTextureReplacements());
             spriteReplacements.putAll(config.getSpriteReplacements());
             hideTitle = config.shouldHideTitle();
-            GUITextureChanger.LOGGER.info("Loaded {} texture replacements and {} sprite replacements for screen: {} (hide title: {})",
-                    textureReplacements.size(), spriteReplacements.size(), screenId, hideTitle);
+            GUITextureChanger.LOGGER.info("Loaded {} texture replacements and {} sprite replacements for block: {} (hide title: {})",
+                    textureReplacements.size(), spriteReplacements.size(), blockId, hideTitle);
         }
     }
 }
